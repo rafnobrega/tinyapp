@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
-//This code sets EJS as the view engine for the Express application using:
+// ##### VIEW ENGINE ##### //
 app.set("view engine", "ejs");
 
 // Generate a Random ShortURL - this is a simulation only
@@ -13,12 +13,11 @@ function generateRandomString() {
 }
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
+  "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
 
 // ##### BODY-PARSER SETUP ##### //
-// Info: the body-parser library will convert the request body from a Buffer into string that we can read. It will then add the data to the req(request) object under the key body.
 const bodyParser = require("body-parser");
 const { response } = require("express");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,6 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render("urls_index", templateVars);
+  
 });
 
 // ##### NEW URL PAGE ##### //
@@ -60,41 +60,36 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
-
-app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
-});
-
-// define the route that will match this POST request and handle it.
-//Let's start with a simple definition that logs the request body and gives a dummy response.
+// ##### CREATE NEW URL ##### //
 app.post("/urls", (req, res) => {
-  console.log("req.body log:", req.body); // Log the POST request body to the console
+  // Log the POST request body to the console
+  console.log("## CREATE NEW URL - req.body ##", req.body);
   const longer = req.body.longURL;
   const shorter = generateRandomString(longer);
   urlDatabase[shorter] = longer;
-    console.log("MY DATABASEeeeee:", urlDatabase);
-  res.redirect(`/urls/${shorter}`); // Respond with 'Ok' (we will replace this)
+  res.redirect(`/urls`);
 });
+
 
 // ##### DELETE AN URL ##### //
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shorter = req.params.shortURL;
-  console.log("THIS IS SHORTER - LOG 1:", shorter);
-  console.log("MY DATABASE - LOG 1:", urlDatabase);
   delete urlDatabase[shorter];
-  console.log("MY DATABASE - LOG 2:", urlDatabase);
-  return res.redirect(`/urls`);
+  res.redirect(`/urls`);
 });
 
+// ##### EDIT AN URL ##### //
+app.post("/urls/:shortURL", (req, res) => {
+  const longer = req.body.id;
+  console.log("## req.body.id ##", req.body.id);
+  console.log("## longer variable ##", req.body);
+  console.log("## longer ##", longer);
+  urlDatabase[req.params.shortURL] = longer;
 
+  res.redirect(`/urls/${req.params.shortURL}`);
+});
+
+// ##### LISTEN ##### //
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
