@@ -80,8 +80,20 @@ app.post("/urls", (req, res) => {
   const longer = req.body.longURL;
   const shorter = generateRandomString(longer);
   urlDatabase[shorter] = longer;
+    console.log("MY DATABASEeeeee:", urlDatabase);
   res.redirect(`/urls/${shorter}`); // Respond with 'Ok' (we will replace this)
 });
+
+// ##### DELETE AN URL ##### //
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shorter = req.params.shortURL;
+  console.log("THIS IS SHORTER - LOG 1:", shorter);
+  console.log("MY DATABASE - LOG 1:", urlDatabase);
+  delete urlDatabase[shorter];
+  console.log("MY DATABASE - LOG 2:", urlDatabase);
+  return res.redirect(`/urls`);
+});
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
