@@ -80,13 +80,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 // ##### EDIT AN URL ##### //
 app.post("/urls/:shortURL", (req, res) => {
-  const longer = req.body.id;
-  console.log("## req.body.id ##", req.body.id);
+  const longer = req.body.longURL;
+  console.log("## req.body.id ##", req.body.longURL);
   console.log("## longer variable ##", req.body);
   console.log("## longer ##", longer);
   urlDatabase[req.params.shortURL] = longer;
 
-  res.redirect(`/urls/${req.params.shortURL}`);
+  return res.redirect("/urls");
 });
 
 // ##### LISTEN ##### //

@@ -24,9 +24,16 @@
         <div class="p-3 mb-2 bg-light text-white border border-primary">
           <h4 name="edit" style="color: blue">Edit:</h4>
           <form method="POST" action="/urls/<%= shortURL %>">
-          <p class="card-text" style="color: blue">New URL:
-          <input type="text" name="id" placeholder="long URL here" required />
-          <button type="submit" class="btn btn-primary">Submit</button></p>
+            <p class="card-text" style="color: blue">
+              New URL:
+              <input
+                type="text"
+                name="longURL"
+                placeholder="long URL here"
+                required
+              />
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </p>
           </form>
         </div>
         <!-- End of Edit functionality -->
