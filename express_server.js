@@ -17,26 +17,41 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+
+
+// ##### 🍪 COOKIE-PARSER SETUP ##### //
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
+
 // ##### BODY-PARSER SETUP ##### //
 const bodyParser = require("body-parser");
 const { response } = require("express");
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  console.log("REQ. COOKIES:", req.signedCookies);
+  const templateVars = { 
+    username: req.cookies["username"],
+    urls: urlDatabase 
+  };
   res.render("urls_index", templateVars);
   
 });
 
 // ##### NEW URL PAGE ##### //
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"],
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: req.params.longURL,
+    username: req.cookies["username"],
   };
   res.render("urls_show", templateVars);
 });
@@ -58,6 +73,25 @@ app.get("/", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+
+
+// ##### LOGIN ##### //
+app.post("/login", (req, res) => {
+  const email = req.body.username;
+  if (!email) {
+    return res.status(401).send("Unauthorized access - Please go back and provide a valid email address.");
+  } 
+   res.cookie("username", email);
+   res.redirect(`/urls`);
+});
+
+// ##### LOGOUT ##### //
+app.post("/logout", (req, res) => {
+  const email = req.body.username;
+   res.clearCookie("username", email);
+   res.redirect(`/urls`);
 });
 
 // ##### CREATE NEW URL ##### //
