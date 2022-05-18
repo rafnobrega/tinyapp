@@ -26,12 +26,12 @@ const userDatabase = {
   userRandomID: {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: "test",
   },
   user2RandomID: {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk",
+    password: "test2",
   },
 };
 
@@ -119,13 +119,16 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const id = generateRandomString();
-  // Checks if email and password are empty
+  // Checks if email and password are empty:
   if (!email || !password) {
     return res.status(400).send("Please enter an email address and password to register.");
   }
-  // Check if email already exists in the database
-  
-
+  // Check if email already exists in the database:
+  const checkIfEmailExists = checkIfUserExists(email, userDatabase);
+  if (checkIfEmailExists) {
+    return res.status(400).send(`This email is already registered. Please use a different email address to create your account.`)
+  }
+  // Create a new user (after passing the two checks above):
   const newUser = { id, email, password };
   userDatabase[id] = {id, email, password};
   console.log("USERDATABASE LOG:", userDatabase);
