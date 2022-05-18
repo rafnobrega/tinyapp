@@ -19,7 +19,7 @@
       </div>
       <!-- LOGIN / LOGOUT -->
       <div>
-        <% if (!username) {%>
+        <% if (!user) {%>
         <form method="POST" action="/login" class="navbar-nav d-flex justify-content-between">
           <input type="text" name="username" placeholder="username" required />
           <button type="submit" class="btn btn-dark">Login</button>
@@ -27,7 +27,7 @@
        
       <% } else { %>
         <form method="POST" action="/logout" class="navbar-nav d-flex justify-content-between">
-        <p class="text-white"></p>Logged in as <%= username %></p>
+        <p class="text-white"></p>Logged in as <%= user.email %></p>
         <button type="submit" class="btn btn-dark">Logout</button>
       <% } %>
       </form>
