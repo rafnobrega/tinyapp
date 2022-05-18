@@ -47,6 +47,11 @@ const { response } = require("express");
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
+
+// ________________________________________________________________
+
+
+
 //  🗂 INDEX PAGE 🗂  //
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
@@ -138,6 +143,17 @@ app.post("/register", (req, res) => {
   res.redirect(`/urls`);
 })
 
+
+//  🪵 LOGIN 🪵  //
+app.get("/login", (req, res) => {
+  const userID = req.cookies["user_id"];
+  const user = userDatabase[userID];
+  const templateVars = {
+    user,
+    username: req.cookies["username"],
+  };
+  res.render("login", templateVars);
+});
 
 //  🪵 LOGIN 🪵  //
 app.post("/login", (req, res) => {
