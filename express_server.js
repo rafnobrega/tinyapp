@@ -17,6 +17,11 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 };
 
+
+
+// ##### 🍪 COOKIE-PARSER SETUP ##### //
+const cookieParser = require("cookie-parser");
+
 // ##### BODY-PARSER SETUP ##### //
 const bodyParser = require("body-parser");
 const { response } = require("express");
@@ -59,6 +64,19 @@ app.get("/", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+
+
+// ##### LOGIN ##### //
+app.post("/login", (req, res) => {
+  const email = req.body.username;
+  if (!email) {
+    return res.status(401).send("Unauthorized access - Please go back and provide a valid email address.");
+  } 
+   res.cookie("username", email);
+   res.redirect(`/urls`);
+});
+
 
 // ##### CREATE NEW URL ##### //
 app.post("/urls", (req, res) => {
