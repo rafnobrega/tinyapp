@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const { checkIfUserExists } = require("./helperFunctions");
 const PORT = 8080; // default port 8080
 
 //  VIEW ENGINE  //
@@ -8,7 +9,6 @@ app.set("view engine", "ejs");
 // #### RANDOM shortURL GENERATOR  // 
 function generateRandomString() {
   let str = Math.random().toString(36).slice(2, 8);
-  console.log("THIS IS MY STR:", str);
   return str;
 }
 
@@ -34,7 +34,7 @@ const userDatabase = {
     password: "dishwasher-funk",
   },
 };
-console.log("MY USER DATABASE IS HERE $$$", userDatabase);
+
 
 //  🍪 COOKIE-PARSER SETUP 🍪 //
 const cookieParser = require("cookie-parser");
@@ -119,10 +119,16 @@ app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const id = generateRandomString();
+  // Checks if email and password are empty
+  if (!email || !password) {
+    return res.status(400).send("Please enter an email address and password to register.");
+  }
+  // Check if email already exists in the database
+  
+
   const newUser = { id, email, password };
-  // console.log("USER ===>:", newUser);
   userDatabase[id] = {id, email, password};
-  console.log("USERDATABASE ===>:", userDatabase);
+  console.log("USERDATABASE LOG:", userDatabase);
 
   // res.cookie("username", email);  
   res.cookie("user_id", id);
