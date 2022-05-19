@@ -15,9 +15,18 @@ function generateRandomString() {
 
 //  📀 URL DB 📀  //
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
-  "a1b2c3": "http://www.rafnobrega.com"
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
+  a1b2c3: {
+    longURL: "https://www.rafnobrega.com",
+    userID: "aJ48lW",
+  },
 };
 
 
@@ -34,7 +43,7 @@ const userDatabase = {
     password: "123",
   },
   user3RandomID: {
-    id: "q",
+    id: "aJ48lW",
     email: "q@q",
     password: "123",
   },
@@ -64,7 +73,7 @@ app.get("/urls", (req, res) => {
   const templateVars = { 
     user,
     username: req.cookies["user_id"],
-    urls: urlDatabase 
+    urls: urlDatabase,
   };
   res.render("urls_index", templateVars);
   
@@ -78,20 +87,24 @@ app.get("/urls/new", (req, res) => {
     res.redirect(`/login`);
   }
     const templateVars = {
-    user,
-    username: req.cookies["user_id"],
-  };
+      user,
+      username: req.cookies["user_id"],
+    };
   res.render("urls_new", templateVars);
 });
 
 //  🎪 SHOW URL 🎪  //
 app.get("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  if (!urlDatabase.hasOwnProperty(shortURL)) {
+    return res.status(404).send("The page requested was not found. -Rafael");
+  }
   const userID = req.cookies["user_id"];
   const user = userDatabase[userID];
   const templateVars = {
     user,
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     username: req.cookies["user_id"],
   };
   res.render("urls_show", templateVars);
@@ -99,12 +112,13 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //  🔄 REDIRECT SHORT URLs 🔄  //
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  if (longURL !== undefined) {
+  const shortURL = req.params.shortURL;
+  if (!urlDatabase.hasOwnProperty(shortURL)) {
+    return res.status(404).send("The page requested was not found. -Rafael");
+    }
+  const longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
-  } else {
-    res.status(404).send("The page requested was not found. -Rafael");
-  }
+  
 });
 
 //  🏡 HOME 🏡  //
@@ -199,7 +213,9 @@ app.post("/urls", (req, res) => {
   }
   const longer = req.body.longURL;
   const shorter = generateRandomString(longer);
-  urlDatabase[shorter] = longer;
+  // urlDatabase[shorter] = longer;
+  urlDatabase[shorter] = {longURL: req.body.longURL, userID: req.cookies["user_id"]};
+  
   res.redirect(`/urls`);
 });
 
@@ -220,7 +236,7 @@ app.post("/urls/:shortURL", (req, res) => {
     return res.status(401).send("You don't have permission to do this.");
   }
   const longer = req.body.longURL;
-  urlDatabase[req.params.shortURL] = longer;
+  urlDatabase[req.params.shortURL].longURL = longer;
   return res.redirect("/urls");
 });
 
