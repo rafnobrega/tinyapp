@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { checkIfUserExists, checkIfPasswordMatches } = require("./helperFunctions");
+const { checkIfUserExists, checkIfPasswordMatches, urlsForUser } = require("./helperFunctions");
 const PORT = 8080; // default port 8080
 
 //  VIEW ENGINE  //
@@ -17,15 +17,15 @@ function generateRandomString() {
 const urlDatabase = {
   b6UTxQ: {
     longURL: "https://www.tsn.ca",
-    userID: "aJ48lW",
+    userID: "user2RandomID",
   },
   i3BoGr: {
     longURL: "https://www.google.ca",
-    userID: "aJ48lW",
+    userID: "user2RandomID",
   },
   a1b2c3: {
     longURL: "https://www.rafnobrega.com",
-    userID: "aJ48lW",
+    userID: "user2RandomID",
   },
 };
 
@@ -68,16 +68,27 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 //  🗂 INDEX PAGE 🗂  //
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
+  let userID = req.cookies["user_id"];
   const user = userDatabase[userID];
   const templateVars = { 
     user,
-    username: req.cookies["user_id"],
-    urls: urlDatabase,
+    urls: urlsForUser(userID, urlDatabase),
   };
-  res.render("urls_index", templateVars);
+
+  if (!userID) {
+        return res.status(401).send("401: Please go back and log in; or register first.");
+    }
   
+  let newUserDatabase = urlsForUser(userID, urlDatabase);
+  if (newUserDatabase) {
+  res.render("urls_index", templateVars);
+  } 
+  // else {
+  //   return res.status(401).send("RAFAEL WAS HERE");
+  // }
+
 });
+
 
 //  🆕  NEW URL PAGE 🆕  //
 app.get("/urls/new", (req, res) => {
