@@ -1,10 +1,10 @@
 const bcrypt = require("bcryptjs");
 
-// #### random string generator  // 
-function generateRandomString() {
+// Random string generator //
+const generateRandomString = () => {
   let str = Math.random().toString(36).substring(2, 8);
   return str;
-}
+};
 
 // Check if the user object exists in the database - by email: //
 const getUserByEmail = function(email, database) {
@@ -16,8 +16,8 @@ const getUserByEmail = function(email, database) {
   return undefined;
 };
 
-// Check if the password matches
-const checkIfPasswordMatches = function (email, password, database) {
+// Check if the password matches //
+const checkIfPasswordMatches = function(email, password, database) {
   for (const id in database) {
     if (database[id].email === email) {
       if (bcrypt.compareSync(password, database[id].password)) {
@@ -29,7 +29,7 @@ const checkIfPasswordMatches = function (email, password, database) {
 };
 
 // Function that returns a list of URLs associated with the userID
-const urlsForUser = function (id, database) {
+const urlsForUser = function(id, database) {
   let urls = {};
   for (let url in database) {
     if (database[url].userID === id) {
@@ -39,4 +39,9 @@ const urlsForUser = function (id, database) {
   return urls;
 };
 
-module.exports = { getUserByEmail, checkIfPasswordMatches, urlsForUser, generateRandomString };
+module.exports = {
+  getUserByEmail,
+  checkIfPasswordMatches,
+  urlsForUser,
+  generateRandomString,
+};

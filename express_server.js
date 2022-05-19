@@ -14,6 +14,24 @@ const PORT = 8080;
 //  VIEW ENGINE  //
 app.set("view engine", "ejs");
 
+//  🍪 COOKIE-SESSION SETUP 🍪 //
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["secret"],
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
+
+//  🧍‍♂️ BODY-PARSER SETUP 🧍‍♂️  //
+const bodyParser = require("body-parser");
+const { response } = require("express");
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(morgan("dev"));
+
+// ________________________________________________________________
+
 //  📀 URL DB 📀  //
 const urlDatabase = {
   a1b2c3: {
@@ -30,22 +48,6 @@ const userDatabase = {
     password: bcrypt.hashSync("1234", 10),
   },
 };
-
-//  🍪 COOKIE-SESSION SETUP 🍪 //
-app.use(
-  cookieSession({
-    name: "session",
-    keys: ["secret"],
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-  })
-);
-
-//  🧍‍♂️ BODY-PARSER SETUP 🧍‍♂️  //
-const bodyParser = require("body-parser");
-const { response } = require("express");
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(morgan("dev"));
 
 // ________________________________________________________________
 
