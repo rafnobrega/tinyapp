@@ -2,31 +2,17 @@ const express = require("express");
 const morgan = require("morgan");
 const bcrypt = require("bcryptjs");
 const cookieSession = require('cookie-session');
-// const cookieParser = require("cookie-parser");
 const app = express();
-const { getUserByEmail, checkIfPasswordMatches, urlsForUser } = require("./helperFunctions");
-const PORT = 8080; // default port 8080
+const { getUserByEmail, checkIfPasswordMatches, urlsForUser, generateRandomString } = require("./helpers");
+const PORT = 8080; 
 
 //  VIEW ENGINE  //
 app.set("view engine", "ejs");
 
-// #### RANDOM shortURL GENERATOR  // 
-function generateRandomString() {
-  let str = Math.random().toString(36).substring(2, 8);
-  return str;
-}
 
 
 //  📀 URL DB 📀  //
 const urlDatabase = {
-  b6UTxQ: {
-    longURL: "https://www.tsn.ca",
-    userID: "user2RandomID",
-  },
-  i3BoGr: {
-    longURL: "https://www.google.ca",
-    userID: "user2RandomID",
-  },
   a1b2c3: {
     longURL: "https://www.rafnobrega.com",
     userID: "user2RandomID",
@@ -51,7 +37,6 @@ app.use(
     keys: ["secret"],
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
   }));
-// app.use(cookieParser());
 
 
 //  🧍‍♂️ BODY-PARSER SETUP 🧍‍♂️  //
@@ -67,7 +52,6 @@ app.use(morgan('dev'));
 
 //  🗂 INDEX PAGE 🗂  //
 app.get("/urls", (req, res) => {
-  // let userID = req.cookies["user_id"];
   let userID = req.session.user_id;
   const user = userDatabase[userID];
   const templateVars = { 
@@ -88,7 +72,6 @@ app.get("/urls", (req, res) => {
 
 //  🆕  NEW URL PAGE 🆕  //
 app.get("/urls/new", (req, res) => {
-  // const userID = req.cookies["user_id"];
   const userID = req.session.user_id;
     const user = userDatabase[userID];
   if (!userID) {
@@ -96,7 +79,6 @@ app.get("/urls/new", (req, res) => {
   }
     const templateVars = {
       user,
-      // username: req.cookies["user_id"],
     };
   res.render("urls_new", templateVars);
 });
@@ -107,14 +89,12 @@ app.get("/urls/:shortURL", (req, res) => {
   if (!urlDatabase.hasOwnProperty(shortURL)) {
     return res.status(404).send("The page requested was not found. -Rafael");
   }
-  // const userID = req.cookies["user_id"];
   const userID = req.session.user_id;
   const user = userDatabase[userID];
   const templateVars = {
     user,
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL].longURL,
-    // username: req.cookies["user_id"],
   };
   res.render("urls_show", templateVars);
 });
@@ -141,12 +121,10 @@ app.get("/urls.json", (req, res) => {
 
 //  🍏 REGISTER - GET 🍏  //
 app.get("/register", (req, res) => {
-  // const userID = req.cookies["user_id"];
   const userID = req.session.user_id;
   const user = userDatabase[userID];
   const templateVars = {
     user,
-    // username: req.cookies["user_id"],
   };
   res.render("register", templateVars);
 })
@@ -179,11 +157,9 @@ app.post("/register", (req, res) => {
 //  🪵 LOGIN 🪵  //
 app.get("/login", (req, res) => {
   const userID = req.session.user_id;
-  // const userID = req.cookies["user_id"];
   const user = userDatabase[userID];
   const templateVars = {
     user,
-    // username: req.cookies["user_id"],
   };
   res.render("login", templateVars);
 });
@@ -219,14 +195,11 @@ app.post("/logout", (req, res) => {
 
 //  🆕 CREATE NEW URL 🆕  //
 app.post("/urls", (req, res) => {
-  // if (!req.cookies["user_id"]) {
   if (!req.session.user_id) {
     return res.send("You don't have permission to do this.");
   }
   const longer = req.body.longURL;
   const shorter = generateRandomString(longer);
-  // urlDatabase[shorter] = longer;
-  // urlDatabase[shorter] = {longURL: req.body.longURL, userID: req.cookies["user_id"]};
   urlDatabase[shorter] = {longURL: req.body.longURL, userID: req.session.user_id};
   
   res.redirect(`/urls`);
@@ -235,7 +208,6 @@ app.post("/urls", (req, res) => {
 
 //  🗑 DELETE AN URL 🗑  //
 app.post("/urls/:shortURL/delete", (req, res) => {
-    // if (!req.cookies["user_id"]) {
     if (!req.session.user_id) {
       return res.status(401).send("You don't have permission to do this.");
     }
@@ -246,7 +218,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //  📝 EDIT AN URL 📝  //
 app.post("/urls/:shortURL", (req, res) => {
-    // if (!req.cookies["user_id"]) {
     if (!req.session.user_id) {
       return res.status(401).send("You don't have permission to do this.");
     }

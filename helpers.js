@@ -1,5 +1,11 @@
 const bcrypt = require("bcryptjs");
 
+// #### random string generator  // 
+function generateRandomString() {
+  let str = Math.random().toString(36).substring(2, 8);
+  return str;
+}
+
 // Check if the user object exists in the database - by email: //
 const getUserByEmail = function(email, database) {
   for (const user in database) {
@@ -33,4 +39,4 @@ const urlsForUser = function (id, database) {
   return urls;
 };
 
-module.exports = { getUserByEmail, checkIfPasswordMatches, urlsForUser };
+module.exports = { getUserByEmail, checkIfPasswordMatches, urlsForUser, generateRandomString };
