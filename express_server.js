@@ -1,4 +1,6 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
+const morgan = require("morgan");
 const app = express();
 const { getUserByEmail, checkIfPasswordMatches, urlsForUser } = require("./helperFunctions");
 const PORT = 8080; // default port 8080
@@ -34,18 +36,8 @@ const urlDatabase = {
 const userDatabase = {
   userRandomID: {
     id: "userRandomID",
-    email: "user@example.com",
-    password: "test",
-  },
-  user2RandomID: {
-    id: "a",
-    email: "a@a",
-    password: "123",
-  },
-  user3RandomID: {
-    id: "aJ48lW",
-    email: "q@q",
-    password: "123",
+    email: "user@u.com",
+    password: bcrypt.hashSync("1234", 10),
   },
 };
 
@@ -60,7 +52,7 @@ const bodyParser = require("body-parser");
 const { response } = require("express");
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
+app.use(morgan('dev'));
 
 // ________________________________________________________________
 
@@ -156,22 +148,22 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const id = generateRandomString();
+  
   // Checks if email and password are empty:
   if (!email || !password) {
     return res.status(400).send("Please enter an email address and password to register.");
   }
   // Check if email already exists in the database:
-  const checkIfEmailExists = getUserByEmail(email, userDatabase);
-  if (checkIfEmailExists) {
+  const userExist = getUserByEmail(email, userDatabase);
+  if (userExist) {
     return res.status(400).send(`This email is already registered. Please use a different email address.`)
   }
-  // Create a new user (after passing the two checks above):
-  const newUser = { id, email, password };
-  userDatabase[id] = {id, email, password};
+  // Happy-path => Create a new user:
+  const id = generateRandomString();
+  const hashPassword = bcrypt.hashSync(password, 10);
+  const newUser = { id, email, password: hashPassword };
+  userDatabase[id] = newUser;
   console.log("USERDATABASE LOG:", userDatabase);
-
-  // res.cookie("username", email);  
   res.cookie("user_id", id);
   res.redirect(`/urls`);
 })
@@ -192,7 +184,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  // Checks if email and password are empty:
+  // Checks if email and password fields are empty:
   if (!email || !password) {
     return res.status(400).send("400: Please enter an email address and password to login.");
   }
