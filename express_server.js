@@ -73,8 +73,11 @@ app.get("/urls", (req, res) => {
 //  🆕  NEW URL PAGE 🆕  //
 app.get("/urls/new", (req, res) => {
   const userID = req.cookies["user_id"];
-  const user = userDatabase[userID];
-  const templateVars = {
+    const user = userDatabase[userID];
+  if (!userID) {
+    res.redirect(`/login`);
+  }
+    const templateVars = {
     user,
     username: req.cookies["user_id"],
   };
@@ -136,7 +139,7 @@ app.post("/register", (req, res) => {
   // Check if email already exists in the database:
   const checkIfEmailExists = checkIfUserExists(email, userDatabase);
   if (checkIfEmailExists) {
-    return res.status(400).send(`This email is already registered. Please use a different email address to create your account.`)
+    return res.status(400).send(`This email is already registered. Please use a different email address.`)
   }
   // Create a new user (after passing the two checks above):
   const newUser = { id, email, password };
@@ -191,7 +194,9 @@ app.post("/logout", (req, res) => {
 
 //  🆕 CREATE NEW URL 🆕  //
 app.post("/urls", (req, res) => {
-  // Log the POST request body to the console
+  if (!req.cookies["user_id"]) {
+    return res.send("You don't have permission to do this.");
+  }
   const longer = req.body.longURL;
   const shorter = generateRandomString(longer);
   urlDatabase[shorter] = longer;
@@ -201,6 +206,9 @@ app.post("/urls", (req, res) => {
 
 //  🗑 DELETE AN URL 🗑  //
 app.post("/urls/:shortURL/delete", (req, res) => {
+    if (!req.cookies["user_id"]) {
+      return res.status(401).send("You don't have permission to do this.");
+    }
   const shorter = req.params.shortURL;
   delete urlDatabase[shorter];
   res.redirect(`/urls`);
@@ -208,6 +216,9 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 
 //  📝 EDIT AN URL 📝  //
 app.post("/urls/:shortURL", (req, res) => {
+    if (!req.cookies["user_id"]) {
+    return res.status(401).send("You don't have permission to do this.");
+  }
   const longer = req.body.longURL;
   urlDatabase[req.params.shortURL] = longer;
   return res.redirect("/urls");
