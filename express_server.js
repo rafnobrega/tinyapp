@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { checkIfUserExists, checkIfPasswordMatches, urlsForUser } = require("./helperFunctions");
+const { getUserByEmail, checkIfPasswordMatches, urlsForUser } = require("./helperFunctions");
 const PORT = 8080; // default port 8080
 
 //  VIEW ENGINE  //
@@ -8,7 +8,7 @@ app.set("view engine", "ejs");
 
 // #### RANDOM shortURL GENERATOR  // 
 function generateRandomString() {
-  let str = Math.random().toString(36).slice(2, 8);
+  let str = Math.random().toString(36).substring(2, 6);
   return str;
 }
 
@@ -162,7 +162,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Please enter an email address and password to register.");
   }
   // Check if email already exists in the database:
-  const checkIfEmailExists = checkIfUserExists(email, userDatabase);
+  const checkIfEmailExists = getUserByEmail(email, userDatabase);
   if (checkIfEmailExists) {
     return res.status(400).send(`This email is already registered. Please use a different email address.`)
   }
@@ -197,7 +197,7 @@ app.post("/login", (req, res) => {
     return res.status(400).send("400: Please enter an email address and password to login.");
   }
   // Check if email already exists in the database:
-  const userID = checkIfUserExists(email, userDatabase);
+  const userID = getUserByEmail(email, userDatabase);
   if (!userID) {
     return res.status(403).send(`403: The email cannot be found.`)
     }
