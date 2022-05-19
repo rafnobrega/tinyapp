@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { checkIfUserExists } = require("./helperFunctions");
+const { checkIfUserExists, checkIfPasswordMatches } = require("./helperFunctions");
 const PORT = 8080; // default port 8080
 
 //  VIEW ENGINE  //
@@ -33,6 +33,11 @@ const userDatabase = {
     email: "user2@example.com",
     password: "test2",
   },
+  q: {
+    id: "q",
+    email: "q@q",
+    password: "123",
+  },
 };
 
 
@@ -58,7 +63,7 @@ app.get("/urls", (req, res) => {
   const user = userDatabase[userID];
   const templateVars = { 
     user,
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
     urls: urlDatabase 
   };
   res.render("urls_index", templateVars);
@@ -71,7 +76,7 @@ app.get("/urls/new", (req, res) => {
   const user = userDatabase[userID];
   const templateVars = {
     user,
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
   };
   res.render("urls_new", templateVars);
 });
@@ -83,8 +88,8 @@ app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
     user,
     shortURL: req.params.shortURL,
-    longURL: req.params.longURL,
-    username: req.cookies["username"],
+    longURL: urlDatabase[req.params.shortURL],
+    username: req.cookies["user_id"],
   };
   res.render("urls_show", templateVars);
 });
@@ -114,7 +119,7 @@ app.get("/register", (req, res) => {
   const user = userDatabase[userID];
   const templateVars = {
     user,
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
   };
   res.render("register", templateVars);
 })
@@ -150,26 +155,38 @@ app.get("/login", (req, res) => {
   const user = userDatabase[userID];
   const templateVars = {
     user,
-    username: req.cookies["username"],
+    username: req.cookies["user_id"],
   };
   res.render("login", templateVars);
 });
 
 //  🪵 LOGIN 🪵  //
 app.post("/login", (req, res) => {
-  const email = req.body.username;
-  if (!email) {
-    return res.status(401).send("Unauthorized access - Please go back.");
-  } 
-  //  res.cookie("username", email);
-   res.redirect(`/urls`);
+  const email = req.body.email;
+  const password = req.body.password;
+  // Checks if email and password are empty:
+  if (!email || !password) {
+    return res.status(400).send("400: Please enter an email address and password to login.");
+  }
+  // Check if email already exists in the database:
+  const userID = checkIfUserExists(email, userDatabase);
+  if (!userID) {
+    return res.status(403).send(`403: The email cannot be found.`)
+    }
+  // Check if password matches with the password in the database:
+  const checkPassword = checkIfPasswordMatches(email, password, userDatabase);
+    if (checkPassword) {
+      res.cookie("user_id", userID);
+    return res.redirect(`/urls`);
+    } else {
+      return res.status(403).send(`403: The password provided is wrong.`);
+    }
 });
 
 //  🪵 LOGOUT 🪵  //
 app.post("/logout", (req, res) => {
-  const email = req.body.username;
    res.clearCookie("user_id");
-   res.redirect(`/urls`);
+   res.redirect(`/login`);
 });
 
 //  🆕 CREATE NEW URL 🆕  //

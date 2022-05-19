@@ -8,6 +8,19 @@ const checkIfUserExists = function(email, database) {
   return undefined;
 }
 
+// Check if the password matches
+const checkIfPasswordMatches = function (email, password, database) {
+  for (const id in database) {
+    if (database[id].email === email) {
+      if (password === database[id].password) {
+        return database[id];
+      }
+    }
+  }
+  return undefined;
+};
 
 
-module.exports = { checkIfUserExists }
+module.exports = { checkIfUserExists, checkIfPasswordMatches }
+
+
