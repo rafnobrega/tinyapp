@@ -44,7 +44,7 @@ const urlDatabase = {
 const userDatabase = {
   userRandomID: {
     id: "userRandomID",
-    email: "a@a.com",
+    email: "user@example.com",
     password: bcrypt.hashSync("1234", 10),
   },
 };
@@ -78,11 +78,12 @@ app.get("/urls/new", (req, res) => {
   const user = userDatabase[userID];
   if (!userID) {
     res.redirect(`/login`);
+  } else {
+    const templateVars = {
+      user,
+    };
+    res.render("urls_new", templateVars);
   }
-  const templateVars = {
-    user,
-  };
-  res.render("urls_new", templateVars);
 });
 
 //  🎪 SHOW URL 🎪  //
@@ -119,6 +120,8 @@ app.get("/", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
+// ________________________________________________________________
 
 //  🍏 REGISTER - GET 🍏  //
 app.get("/register", (req, res) => {
@@ -160,6 +163,8 @@ app.post("/register", (req, res) => {
   res.redirect(`/urls`);
 });
 
+// ________________________________________________________________
+
 //  🪵 LOGIN 🪵  //
 app.get("/login", (req, res) => {
   const userID = req.session.user_id;
@@ -200,6 +205,8 @@ app.post("/logout", (req, res) => {
   req.session = null;
   res.redirect(`/login`);
 });
+
+// ________________________________________________________________
 
 //  🆕 CREATE NEW URL 🆕  //
 app.post("/urls", (req, res) => {
