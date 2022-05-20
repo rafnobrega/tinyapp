@@ -14,8 +14,9 @@ Happy URL-shortening!
 
 ## Final Product
 
-!["screenshot description"](#)
-!["screenshot description"](#)
+!["Screenshot of URLs page"](https://github.com/rafnobrega/tinyapp/blob/main/docs/urls-page.png?raw=true)
+!["Screenshot of register page"](https://github.com/rafnobrega/tinyapp/blob/main/docs/register-page.png?raw=true)
+!["Screenshot of Edit URL page"](https://github.com/rafnobrega/tinyapp/blob/main/docs/edit-url-page.png?raw=true)
 
 ## Dependencies
 
